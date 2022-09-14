@@ -22,9 +22,9 @@ public class Calculator {
     public static String LatinoArabCalculator(String str) throws RuntimeException {
         str = str.replace(" ", "");
         boolean latin;
-        if (str.matches("[\\d]{1,2}[+\\-/*][\\d]{1,2}"))
+        if (str.matches("[\\d]{1,2}[\\+\\-/\\*][\\d]{1,2}"))
             latin = false;
-        else if (str.matches("[IVX]{1,4}[+\\-/*][IVX]{1,4}"))
+        else if (str.matches("[IVX]{1,4}[\\+\\-\\/\\*][IVX]{1,4}"))
             latin = true;
         else
             throw new RuntimeException("Неправильный ввод");
@@ -36,16 +36,20 @@ public class Calculator {
                 break;
             }
         }
+        String[] strings = str.split("\\" +operand);
+        System.out.println(strings[0]+operand+strings[1]);
         int first;
         int second;
-        String[] strings = str.split("\\" + operand);
 
         if (!latin){
             first = Integer.parseInt(strings[0]);
             second = Integer.parseInt(strings[1]);
         } else {
-            first = latinNumberMap.get(strings[0]);
-            second = latinNumberMap.get(strings[1]);
+            if (latinNumberMap.containsKey(strings[0]) && latinNumberMap.containsKey(strings[1]) ) {
+                first = latinNumberMap.get(strings[0]);
+                second = latinNumberMap.get(strings[1]);
+            } else
+                throw new RuntimeException("Недопустимое римское число");
         }
         if (first > 10 || second > 10) throw new RuntimeException("Операнды не должны быть более 10");
 
@@ -68,24 +72,28 @@ public class Calculator {
     }
 
     private static String arabToLatin(int arabNum) {
-        StringBuilder latin = new StringBuilder();
+        String latin ="";
         if (arabNum  == 100)
-            return latin.append('C').toString();
+            return "C";
         String [] arrDec = {"", "X","XX","XXX", "XL","L", "LX","LXX", "LXXX","LC"};
         String [] arrNum = {"", "I","II","III", "IV","V", "VI","VII", "VIII","IX"};
         int decimal = arabNum / 10;
-        latin.append(arrDec[decimal]);
+        latin = arrDec[decimal];
         int current = arabNum % 10;
-        latin.append(arrNum[current]);
-        return latin.toString();
+        latin = latin + arrNum[current];
+        return latin;
     }
 
     public static void main(String[] args) {
-        String input = in.nextLine();
-        try {
-            System.out.println(LatinoArabCalculator(input));
-        } catch (Exception e){
-            System.out.println(e.getMessage()) ;
-        }
+        String input;
+        do {
+            System.out.print("Введите формулу (выход EXIT): ");
+            input = in.nextLine();
+            try {
+                System.out.printf("Результат: %s %n", LatinoArabCalculator(input));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        } while(!input.equals("EXIT"));
     }
 }
